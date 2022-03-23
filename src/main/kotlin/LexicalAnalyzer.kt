@@ -149,7 +149,7 @@ class LexicalAnalyzer {
         return state == 2
     }
 
-    fun run(){
+    fun run() {
 
     }
 }
