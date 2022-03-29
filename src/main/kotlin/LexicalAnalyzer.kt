@@ -1,155 +1,320 @@
-class LexicalAnalyzer {
+import java.io.File
 
-//    private var index: Int = 0
+class LexicalAnalyzer() {
 
-    fun isPunctuation(s: String): Punctuation? {
+    var inputFile: String = ""
+
+    constructor(_inputFile: String) : this() {
+        inputFile = _inputFile
+    }
+
+    //    private var index: Int = 0
+    private val lamdaChar = "".plus(Char(955))
+    private val relationalOperator = "RO"
+
+    private val identifiersList: List<String> = ArrayList()
+    private val symbolList: List<String> = ArrayList()
+    private var tokenLexemePairList: List<TokenLexeme> = ArrayList()
+
+    fun isPunctuation(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
-            if (Punctuation.values().any { it.char == s[0] }) {
-                return Punctuation.values().find { it.char == s[0] }
+            if (s[0] == ';' || s[0] == ',') {
+                return TokenLexeme(s[0].toString(), lamdaChar)
             }
         }
         return null
     }
 
-    fun isBracket(s: String): BracketTypes? {
+    fun isBracket(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
-            if (BracketTypes.values().any { it.char == s[0] }) {
-                return BracketTypes.values().find { it.char == s[0] }
+            if (s[0] == '(' || s[0] == ')' || s[0] == '[' || s[0] == ']' || s[0] == '{' || s[0] == '}') {
+                return TokenLexeme(s[0].toString(), lamdaChar)
             }
         }
         return null
     }
 
-    fun isKeyWord(s: String): KeyWords? {
+    fun isKeyWord(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
-            if (s.length > 1 && KeyWords.values().any { it.string == s.substring(0, 2) }) {
-                return KeyWords.values().find { it.string == s.substring(0, 2) }
+            if (s.length > 1 && s.substring(0, 2) == "if") {
+                return TokenLexeme(s.substring(0, 2).uppercase(), lamdaChar)
             }
-            if (s.length > 2 && KeyWords.values().any { it.string == s.substring(0, 3) }) {
-                return KeyWords.values().find { it.string == s.substring(0, 3) }
+            if (s.length > 2) {
+                val subString = s.substring(0, 3)
+                if (subString == "def" || subString == "ret") {
+                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                }
             }
-            if (s.length > 3 && KeyWords.values().any { it.string == s.substring(0, 4) }) {
-                return KeyWords.values().find { it.string == s.substring(0, 4) }
+            if (s.length > 3) {
+                val subString = s.substring(0, 4)
+                if (subString == "read" || subString == "else") {
+                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                }
             }
-            if (s.length > 4 && KeyWords.values().any { it.string == s.substring(0, 5) }) {
-                return KeyWords.values().find { it.string == s.substring(0, 5) }
+            if (s.length > 4) {
+                val subString = s.substring(0, 5)
+                if (subString == "while" || subString == "print") {
+                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                }
             }
         }
         return null
     }
 
-    fun isArithmeticOp(s: String): ArithmeticOperator? {
+    fun isArithmeticOp(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
-            if (ArithmeticOperator.values().any { it.char == s[0] }) {
-                return ArithmeticOperator.values().find { it.char == s[0] }
+            if (s[0] == '+' || s[0] == '-' || s[0] == '*' || s[0] == '/') {
+                return TokenLexeme(s[0].toString(), lamdaChar)
             }
         }
         return null
     }
 
-    fun isRelationalOp(s: String): RelationalOperator? {
+    fun isRelationalOp(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
-            if (s.length > 1 && RelationalOperator.values().any { it.string == s.substring(0, 2) }) {
-                return RelationalOperator.values().find { it.string == s.substring(0, 2) }
+            if (s.length > 1) {
+                when (s.substring(0, 2)) {
+                    "<=" -> return TokenLexeme(relationalOperator, "LE")
+                    ">=" -> return TokenLexeme(relationalOperator, "GE")
+                    "==" -> return TokenLexeme(relationalOperator, "EQ")
+                    "<>" -> return TokenLexeme(relationalOperator, "NE")
+                }
             }
-            if (RelationalOperator.values().any { it.string == s.substring(0, 1) }) {
-                return RelationalOperator.values().find { it.string == s.substring(0, 1) }
+            if (s.isNotEmpty()) {
+                when (s.substring(0, 1)) {
+                    "<" -> return TokenLexeme(relationalOperator, "LT")
+                    ">" -> return TokenLexeme(relationalOperator, "GT")
+                }
             }
         }
         return null
     }
 
-    fun isDataType(s: String): DataTypes? {
-        if (s.isNotEmpty()) {
-            if (s.length > 3 && DataTypes.values().any { it.string == s.substring(0, 4) }) {
-                return DataTypes.values().find { it.string == s.substring(0, 4) }
-            }
-            if (s.length > 4 && DataTypes.values().any { it.string == s.substring(0, 5) }) {
-                return DataTypes.values().find { it.string == s.substring(0, 5) }
+    fun isAssignmentOp(s: String): TokenLexeme? {
+        if (s.length > 1) {
+            if (s.substring(0, 2) == ("<-")) {
+                return TokenLexeme("<-", lamdaChar)
             }
         }
         return null
     }
 
-    fun isLiteral(s: String): Literal? {
+    fun isDataType(s: String): TokenLexeme? {
+        if (s.isNotEmpty()) {
+            if (s.length > 3 && s.substring(0, 4) == "int ") {
+                return TokenLexeme("INT", lamdaChar)
+            }
+            if (s.length > 4 && s.substring(0, 5) == "char ") {
+                return TokenLexeme("CHAR", lamdaChar)
+            }
+        }
+        return null
+    }
+
+    fun isLiteral(s: String): Int {
+        var length = 0
         var state = 1
         for (i in s.indices) {
             when (state) {
                 1 -> {
-                    if (s[0].code == 39) //character '
+                    if (s[0].code == 39) { //character '
                         state = 4
-                    else if (s[0] == '"') {
+                        length++
+                    } else if (s[0] == '"') {
                         state = 2
+                        length++
                     }
                 }
                 2 -> {
-                    if (s[i] == '"')
+                    length++
+                    if (s[i] == '"') {
                         state = 3
+                    }
                 }
                 4 -> {
-                    state = 5
+                    state = if (s[i].code == 39) { //character '
+                        length = 0
+                        -1
+                    } else {
+                        length++
+                        5
+                    }
                 }
                 5 -> {
-                    state = if (s[i].code == 39) //character '
+                    state = if (s[i].code == 39) { //character '
+                        length++
                         6
-                    else -1
+                    } else {
+                        length = 0
+                        -1
+                    }
                 }
             }
         }
-        return when (state) {
-            3 -> Literal.STRING
-            6 -> Literal.CHARACTER
-            else -> null
-        }
+        return length
     }
 
-    fun isIdentifier(s: String): Boolean { //TODO: check for special characters
+    fun isIdentifier(s: String): Int { // TODO: 3/23/2022 check for special characters
+        var length = 0
         var state = 1
         for (i in s.indices) {
             when (state) {
                 1 ->
                     if (s[0].isLetter()) {
                         state = 2
+                        length++
                     }
                 2 ->
-                    state = if (s[i].isLetterOrDigit()) 2 else 3
+                    state = if (s[i].isLetterOrDigit()) {
+                        length++
+                        2
+                    } else 3
             }
         }
-        return state != 1
+        return length
     }
 
-    fun isAssignmentOp(s: String): Boolean {
-        var state = 1
-        if (s.length > 1) {
-            if (s.substring(0, 2).equals("<-", true)) {
-                state = 2
-            }
-        }
-        return state != 1
-    }
-
-    fun isNumericConstant(s: String): Boolean {
+    fun isNumericConstant(s: String): Int {
+        var length = 0
         var state = 1
         for (i in s.indices) {
             when (state) {
                 1 -> {
-                    state = if (s[0].isDigit()) {
-                        2
-                    } else
+                    state = if (s[i].isDigit()) {
+                        length++
+                        1
+                    } else if(!s[i].isLetter()){
                         3
-                }
-                2 -> {
-                    state = if (s[i].isDigit())
-                        2
-                    else
+                    } else {
+                        length = 0
                         3
+                    }
                 }
             }
         }
-        return state == 2
+        return length
     }
 
-    fun run() {
+    private fun removeSingleLineComment(str: String): String {
+        var output = str
+        if (str.isNotEmpty() && str.contains("#")) {
+            output = str.replace(str.substring(str.indexOf('#'), str.indexOf('\n')), "")
+//            output = output.replace(" +", " ") // TODO: 3/23/2022 check why this need to be replaced
+        }
+        return output
+    }
 
+    private fun removeMultiLineComments(str: String): String {
+        var output = str
+        if (str.length > 2 && str.contains("##")) {
+            val start = str.indexOf("##")
+            val end = str.indexOf("##", start + 2)
+            output = str.replace(str.substring(start, end + 2), "")
+//            output = output.replace(" +", " ") // TODO: 3/23/2022 check why this need to be replaced
+
+        }
+        return output
+    }
+
+    private fun addTokenLexemePar(tokenLexeme: TokenLexeme?, wordsPath: String): Int {
+        if (tokenLexeme != null) {
+            tokenLexemePairList = tokenLexemePairList.plus(tokenLexeme)
+            FileUtils.writeFile(wordsPath, tokenLexeme.toString())
+            return if(lamdaChar == tokenLexeme.lexeme)
+                tokenLexeme.token.length
+            else
+                tokenLexeme.lexeme.length
+        }
+        return 0
+    }
+
+    fun run(): List<TokenLexeme> {
+
+        val wordsPath = inputFile.split(".")[0] + "-words.txt"
+        val words = File(wordsPath)
+        if (words.exists())
+            words.delete()
+        val symbolPath = inputFile.split(".")[0] + "-symbols.txt"
+        val symbols = File(symbolPath)
+        if (symbols.exists())
+            symbols.delete()
+
+        FileUtils.writeFile(wordsPath, "")
+        FileUtils.writeFile(symbolPath, "")
+
+        var inputFileString = FileUtils.readFile(inputFile)
+
+        var line: String
+        var tempString: String
+        var lineNo = 0
+
+        while (inputFileString.isNotEmpty()) {
+            inputFileString = removeMultiLineComments(inputFileString)
+
+            line = inputFileString.substring(0, inputFileString.indexOf('\n') + 1)
+            lineNo++
+            val end = inputFileString.indexOf('\n')
+//            inputFileString = inputFileString.replaceFirst(Pattern.quote(inputFileString.substring(0, end + 1)), "")
+            inputFileString = inputFileString.replace(inputFileString.substring(0, end + 1), "")
+            line = removeSingleLineComment(line)
+
+            while (line.isNotEmpty()) {
+                tempString = line
+
+                line = line.substring(addTokenLexemePar(isAssignmentOp(line), wordsPath)).trim()
+                line = line.substring(addTokenLexemePar(isArithmeticOp(line), wordsPath)).trim()
+                line = line.substring(addTokenLexemePar(isRelationalOp(line), wordsPath)).trim()
+                line = line.substring(addTokenLexemePar(isKeyWord(line), wordsPath)).trim()
+                line = line.substring(addTokenLexemePar(isDataType(line), wordsPath)).trim()
+
+                val identifier = isIdentifier(line)
+                if (identifier != 0) {
+                    line =
+                        line.substring(addTokenLexemePar(TokenLexeme("ID", line.substring(0, identifier)), wordsPath))
+                            .trim()
+
+                    if(!FileUtils.lookUp(symbolPath, tokenLexemePairList.last().lexeme)){
+                        symbolList.plus(tokenLexemePairList.last().lexeme)
+                        FileUtils.writeFile(symbolPath, tokenLexemePairList.last().lexeme.plus('\n'))
+                    }
+                }
+
+                line = line.substring(addTokenLexemePar(isBracket(line), wordsPath)).trim()
+                line = line.substring(addTokenLexemePar(isPunctuation(line), wordsPath)).trim()
+
+                val literal = isLiteral(line)
+                if(literal != 0){
+                    var lt = line.substring(0, literal)
+                    lt = if(lt.length > 3 || lt.length == 2){
+                        lt.substring(1, lt.lastIndexOf('"'))
+                    } else {
+                        lt.substring(1,2)
+                    }
+
+                    line = line.substring(addTokenLexemePar(TokenLexeme("LITERAL", lt), wordsPath) + 2).trim()
+                }
+
+                val numeric = isNumericConstant(line)
+                if(numeric != 0) {
+                    line =
+                        line.substring(addTokenLexemePar(TokenLexeme("NUMBER", line.substring(0, numeric)), wordsPath))
+                            .trim()
+                }
+
+                if(tempString == line) {
+                    var notSupported = ""
+                    if (line.indexOf(' ') == -1) {
+                        notSupported = line.substring(0)
+                        line = ""
+                    } else {
+                        notSupported = line.substring(0, line.indexOf(' '))
+                        line = line.substring(line.indexOf(' ') + 1)
+                    }
+                    println("\n Error at line: $lineNo, language not supported : $notSupported")
+                }
+            }
+        }
+
+        return tokenLexemePairList
     }
 }

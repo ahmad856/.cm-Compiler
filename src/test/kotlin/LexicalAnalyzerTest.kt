@@ -7,78 +7,18 @@ internal class LexicalAnalyzerTest {
     private val analyzer: LexicalAnalyzer = LexicalAnalyzer()
 
     @TestFactory
-    fun `return valid punctuations if exists in grammar`() =
-        listOf(
-            ";" to Punctuation.SEMI_COLON,
-            "," to Punctuation.COMA,
-            "" to null,
-            "-" to null,
-            "null" to null
-        ).map { (input, expected) ->
-            dynamicTest(
-                "for input \"$input\" returned Punctuation $expected"
-            ) {
-                val actual = analyzer.isPunctuation(input)
-                assertEquals(expected, actual)
-            }
-        }
-
-    @TestFactory
-    fun `return valid brackets if exists in grammar`() =
-        listOf(
-            "(" to BracketTypes.LEFT_PARENTHESES,
-            ")" to BracketTypes.RIGHT_PARENTHESES,
-            "{" to BracketTypes.LEFT_BRACE,
-            "}" to BracketTypes.RIGHT_BRACE,
-            "[" to BracketTypes.LEFT_SQUARE_BRACKET,
-            "]" to BracketTypes.RIGHT_SQUARE_BRACKET,
-            "" to null,
-            "*" to null,
-            "null" to null
-        ).map { (input, expected) ->
-            dynamicTest(
-                "for input \"$input\" returned Bracket Type $expected"
-            ) {
-                val actual = analyzer.isBracket(input)
-                assertEquals(expected, actual)
-            }
-        }
-
-    @TestFactory
-    fun `return valid keywords if exists in grammar`() =
-        listOf(
-            "def" to KeyWords.DEF,
-            "if" to KeyWords.IF,
-            "else" to KeyWords.ELSE,
-            "while" to KeyWords.WHILE,
-            "ret" to KeyWords.RET,
-            "print" to KeyWords.PRINT,
-            "read" to KeyWords.READ,
-            "" to null,
-            "test" to null,
-            "null" to null
-        ).map { (input, expected) ->
-            dynamicTest(
-                "for input \"$input\" returned Keyword $expected"
-            ) {
-                val actual = analyzer.isKeyWord(input)
-                assertEquals(expected, actual)
-            }
-        }
-
-    @TestFactory
     fun `return Literals if exists in grammar`() =
         listOf(
-            "\"def\"" to Literal.STRING,
-            "\"\"" to Literal.STRING,
-            "\"else\"" to Literal.STRING,
-            "'a'" to Literal.CHARACTER,
-            "'ab'" to null,
-            "''" to null,
-            "1" to null
+            "\"def\"" to 5,
+            "\"\"" to 2,
+            "\"else\"" to 6,
+            "'a'" to 3,
+            "'ab'" to 0,
+            "''" to 0,
+            "1" to 0
         ).map { (input, expected) ->
             dynamicTest(
-                "for input \"$input\" returned Literal $expected"
+                "for input \"$input\" returned $expected"
             ) {
                 val actual = analyzer.isLiteral(input)
                 assertEquals(expected, actual)
@@ -88,13 +28,15 @@ internal class LexicalAnalyzerTest {
     @TestFactory
     fun `check for numeric constants in grammar`() =
         listOf(
-            "123" to true,
-            "123a" to false,
-            "a123" to false,
-            "123a456" to false
+            "1" to 1,
+            "123" to 3,
+            "123a" to 0,
+            "a123" to 0,
+            "1(" to 1,
+            "123a456" to 0
         ).map { (input, expected) ->
             dynamicTest(
-                "for input \"$input\" returned Literal $expected"
+                "for input \"$input\" returned $expected"
             ) {
                 val actual = analyzer.isNumericConstant(input)
                 assertEquals(expected, actual)
@@ -110,7 +52,7 @@ internal class LexicalAnalyzerTest {
             "123a456" to false
         ).map { (input, expected) ->
             dynamicTest(
-                "for input \"$input\" returned Literal $expected"
+                "for input \"$input\" returned $expected"
             ) {
                 val actual = analyzer.isIdentifier(input)
                 assertEquals(expected, actual)
