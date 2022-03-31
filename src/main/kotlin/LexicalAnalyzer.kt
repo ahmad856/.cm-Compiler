@@ -2,75 +2,75 @@ import java.io.File
 
 class LexicalAnalyzer() {
 
-    var inputFile: String = ""
+    private var inputFile: String = ""
 
     constructor(_inputFile: String) : this() {
         inputFile = _inputFile
     }
 
     //    private var index: Int = 0
-    private val lamdaChar = "".plus(Char(955))
+    private val lambdaChar = "".plus(Char(955))
     private val relationalOperator = "RO"
 
     private val identifiersList: List<String> = ArrayList()
     private val symbolList: List<String> = ArrayList()
     private var tokenLexemePairList: List<TokenLexeme> = ArrayList()
 
-    fun isPunctuation(s: String): TokenLexeme? {
+    private fun isPunctuation(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s[0] == ';' || s[0] == ',') {
-                return TokenLexeme(s[0].toString(), lamdaChar)
+                return TokenLexeme(s[0].toString(), lambdaChar)
             }
         }
         return null
     }
 
-    fun isBracket(s: String): TokenLexeme? {
+    private fun isBracket(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s[0] == '(' || s[0] == ')' || s[0] == '[' || s[0] == ']' || s[0] == '{' || s[0] == '}') {
-                return TokenLexeme(s[0].toString(), lamdaChar)
+                return TokenLexeme(s[0].toString(), lambdaChar)
             }
         }
         return null
     }
 
-    fun isKeyWord(s: String): TokenLexeme? {
+    private fun isKeyWord(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s.length > 1 && s.substring(0, 2) == "if") {
-                return TokenLexeme(s.substring(0, 2).uppercase(), lamdaChar)
+                return TokenLexeme(s.substring(0, 2).uppercase(), lambdaChar)
             }
             if (s.length > 2) {
                 val subString = s.substring(0, 3)
                 if (subString == "def" || subString == "ret") {
-                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                    return TokenLexeme(subString.uppercase(), lambdaChar)
                 }
             }
             if (s.length > 3) {
                 val subString = s.substring(0, 4)
                 if (subString == "read" || subString == "else") {
-                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                    return TokenLexeme(subString.uppercase(), lambdaChar)
                 }
             }
             if (s.length > 4) {
                 val subString = s.substring(0, 5)
                 if (subString == "while" || subString == "print") {
-                    return TokenLexeme(subString.uppercase(), lamdaChar)
+                    return TokenLexeme(subString.uppercase(), lambdaChar)
                 }
             }
         }
         return null
     }
 
-    fun isArithmeticOp(s: String): TokenLexeme? {
+    private fun isArithmeticOp(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s[0] == '+' || s[0] == '-' || s[0] == '*' || s[0] == '/') {
-                return TokenLexeme(s[0].toString(), lamdaChar)
+                return TokenLexeme(s[0].toString(), lambdaChar)
             }
         }
         return null
     }
 
-    fun isRelationalOp(s: String): TokenLexeme? {
+    private fun isRelationalOp(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s.length > 1) {
                 when (s.substring(0, 2)) {
@@ -90,22 +90,22 @@ class LexicalAnalyzer() {
         return null
     }
 
-    fun isAssignmentOp(s: String): TokenLexeme? {
+    private fun isAssignmentOp(s: String): TokenLexeme? {
         if (s.length > 1) {
             if (s.substring(0, 2) == ("<-")) {
-                return TokenLexeme("<-", lamdaChar)
+                return TokenLexeme("<-", lambdaChar)
             }
         }
         return null
     }
 
-    fun isDataType(s: String): TokenLexeme? {
+    private fun isDataType(s: String): TokenLexeme? {
         if (s.isNotEmpty()) {
             if (s.length > 3 && s.substring(0, 4) == "int ") {
-                return TokenLexeme("INT", lamdaChar)
+                return TokenLexeme("INT", lambdaChar)
             }
             if (s.length > 4 && s.substring(0, 5) == "char ") {
-                return TokenLexeme("CHAR", lamdaChar)
+                return TokenLexeme("CHAR", lambdaChar)
             }
         }
         return null
@@ -220,7 +220,7 @@ class LexicalAnalyzer() {
         if (tokenLexeme != null) {
             tokenLexemePairList = tokenLexemePairList.plus(tokenLexeme)
             FileUtils.writeFile(wordsPath, tokenLexeme.toString())
-            return if(lamdaChar == tokenLexeme.lexeme)
+            return if(lambdaChar == tokenLexeme.lexeme)
                 tokenLexeme.token.length
             else
                 tokenLexeme.lexeme.length
