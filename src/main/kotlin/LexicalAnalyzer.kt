@@ -1,5 +1,3 @@
-import java.io.File
-
 class LexicalAnalyzer() {
 
     private var inputFile: String = ""
@@ -219,7 +217,7 @@ class LexicalAnalyzer() {
     private fun addTokenLexemePar(tokenLexeme: TokenLexeme?, wordsPath: String): Int {
         if (tokenLexeme != null) {
             tokenLexemePairList = tokenLexemePairList.plus(tokenLexeme)
-            FileUtils.writeFile(wordsPath, tokenLexeme.toString())
+            FileUtils.writeFile(wordsPath, tokenLexeme.toString(), true)
             return if(lambdaChar == tokenLexeme.lexeme)
                 tokenLexeme.token.length
             else
@@ -231,16 +229,12 @@ class LexicalAnalyzer() {
     fun run(): List<TokenLexeme> {
 
         val wordsPath = inputFile.split(".")[0] + "-words.txt"
-        val words = File(wordsPath)
-        if (words.exists())
-            words.delete()
-        val symbolPath = inputFile.split(".")[0] + "-symbols.txt"
-        val symbols = File(symbolPath)
-        if (symbols.exists())
-            symbols.delete()
+        val symbolPath = inputFile.split(".")[0] + "-symbolTable.txt"
 
-        FileUtils.writeFile(wordsPath, "")
-        FileUtils.writeFile(symbolPath, "")
+        FileUtils.writeFile(wordsPath, "", false)
+        FileUtils.writeFile(symbolPath, "", false)
+
+        println("\nRunning Lexical Analyzer for cmm")
 
         var inputFileString = FileUtils.readFile(inputFile)
 
@@ -275,7 +269,7 @@ class LexicalAnalyzer() {
 
                     if(!FileUtils.lookUp(symbolPath, tokenLexemePairList.last().lexeme)){
                         symbolList.plus(tokenLexemePairList.last().lexeme)
-                        FileUtils.writeFile(symbolPath, tokenLexemePairList.last().lexeme.plus('\n'))
+                        FileUtils.writeFile(symbolPath, tokenLexemePairList.last().lexeme.plus('\n'), true)
                     }
                 }
 
@@ -302,7 +296,7 @@ class LexicalAnalyzer() {
                 }
 
                 if(tempString == line) {
-                    var notSupported = ""
+                    var notSupported: String
                     if (line.indexOf(' ') == -1) {
                         notSupported = line.substring(0)
                         line = ""

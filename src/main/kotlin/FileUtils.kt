@@ -9,8 +9,8 @@ import java.io.OutputStreamWriter
 
 class FileUtils {
     companion object {
-        fun writeFile(file: String, s: String) {
-            val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(File(file), true)))
+        fun writeFile(file: String, s: String, appendable: Boolean) {
+            val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(File(file), appendable)))
             bw.write(s)
             bw.close()
         }
